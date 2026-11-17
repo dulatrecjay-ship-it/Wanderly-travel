@@ -289,4 +289,21 @@ function drawCat() {
     x.beginPath(); x.moveTo(w / 2, h / 2); x.arc(w / 2, h / 2, R, a, a + s); x.fillStyle = COLORS[i % 4]; x.fill(); a += s;
   });
   x.beginPath(); x.arc(w / 2, h / 2, R * 0.55, 0, 7); x.fillStyle = '#fff'; x.fill();
-  x.fillStyle = '#1e293b'; x.font = 'bold 20px sans
+  x.fillStyle = '#1e293b'; x.font = 'bold 20px sans-serif'; x.textAlign = 'center'; x.fillText(total, w / 2, h / 2 + 7); x.textAlign = 'left';
+}
+function drawTop() {
+  const {x, w, h} = setup($('chartTop'));
+  const t = {};
+  db.bookings.filter(b => b.status === 'Confirmed').forEach(b => { const n = destName(b.destinationId); t[n] = (t[n] || 0) + Number(b.amount); });
+  const rows = Object.entries(t).sort((a, b) => b[1] - a[1]), max = Math.max(1, ...rows.map(r => r[1]));
+  if (!rows.length) { x.fillStyle = '#94a3b8'; x.fillText('No confirmed bookings', 20, 30); return; }
+  rows.forEach(([n, v], i) => {
+    const y = 15 + i * 38, bw = (w - 200) * v / max;
+    x.fillStyle = '#334155'; x.fillText(n, 0, y + 15);
+    x.fillStyle = '#14b8a6'; x.fillRect(100, y, bw, 22);
+    x.fillStyle = '#334155'; x.fillText(money(v), 106 + bw, y + 15);
+  });
+}
+window.addEventListener('resize', drawCharts);
+
+go('dashboard');
